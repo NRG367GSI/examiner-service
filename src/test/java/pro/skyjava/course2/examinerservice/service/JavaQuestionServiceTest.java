@@ -22,17 +22,26 @@ class JavaQuestionServiceTest {
     }
 
     @Test
-    void addQuestionByTextAndAnswer() {
-        Question question = javaQuestionService.add("Q1", "A1");
-        assertEquals("Q1", question.getQuestion());
-        assertEquals("A1", question.getAnswer());
-        assertTrue(javaQuestionService.getAll().contains(question));
+    void addValidQuestionSucceeds() {
+        Question q1 = javaQuestionService.add("Q1", "A1");
+        assertEquals("Q1", q1.getQuestion());
+        assertEquals("A1", q1.getAnswer());
+        assertTrue(javaQuestionService.getAll().contains(q1));
     }
 
     @Test
     void addDuplicateQuestionThrowsException() {
         javaQuestionService.add("Q1", "A1");
         assertThrows(DuplicateQuestionException.class, () -> javaQuestionService.add("Q1", "A1"));
+    }
+
+    @Test
+    void addQuestionWithIdenticalTextAndAnswerThrowsException() {
+        // Проверка для String
+        assertThrows(IllegalArgumentException.class, () -> javaQuestionService.add("Same", "Same"));
+        // Проверка для Question
+        Question invalidQuestion = new Question("Same", "Same");
+        assertThrows(IllegalArgumentException.class, () -> javaQuestionService.add(invalidQuestion));
     }
 
     @Test

@@ -1,33 +1,34 @@
 package pro.skyjava.course2.examinerservice.service;
 
 import org.springframework.stereotype.Service;
-import pro.skyjava.course2.examinerservice.model.Question;
 import pro.skyjava.course2.examinerservice.exception.NotEnoughQuestionsException;
+import pro.skyjava.course2.examinerservice.model.Question;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 @Service
 public class ExaminerServiceImpl implements ExaminerService {
 
-    private final QuestionService javaQuestionService;
+    private final QuestionService questionService;
     private final Random random = new Random();
-    private static final int NOT_ENOUGH_QUESTIONS_ERROR_CODE = 1001; // Код ошибки
 
-    public ExaminerServiceImpl(QuestionService javaQuestionService) {
-        this.javaQuestionService = javaQuestionService;
+    public ExaminerServiceImpl(QuestionService questionService) {
+        this.questionService = questionService;
     }
 
     @Override
     public Collection<Question> getQuestions(int amount) {
-        int totalQuestions = javaQuestionService.getAll().size();
-        if (amount > totalQuestions || amount <= 0) {
-            throw new NotEnoughQuestionsException(NOT_ENOUGH_QUESTIONS_ERROR_CODE, "Запрошено " + amount + " вопросов, доступно " + totalQuestions);
+        int totalQuestions = questionService.getAll().size();
+        if (amount > totalQuestions || amount < 1) {
+            throw new NotEnoughQuestionsException(1, "Запрошено " + amount + " вопросов, доступно " + totalQuestions);
         }
-        return Stream.generate(javaQuestionService::getRandomQuestion)
-                .distinct()
-                .limit(amount)
-                .collect(Collectors.toSet());
+        Set<Question> randomQuestions = new HashSet<>();
+        while (randomQuestions.size() < amount) {
+            randomQuestions.add(questionService.getRandomQuestion());
+        }
+        return randomQuestions;
     }
 }
