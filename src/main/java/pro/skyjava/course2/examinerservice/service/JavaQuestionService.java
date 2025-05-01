@@ -14,14 +14,14 @@ public class JavaQuestionService implements QuestionService {
 
     @Override
     public Question add(String questionText, String answerText) {
-        Question newQuestion = new Question(questionText, answerText);
-        if (newQuestion.getQuestion() == null || newQuestion.getAnswer() == null) {
+        if (questionText == null || answerText == null) {
             throw new NullQuestionException("Вопрос и ответ не могут быть null.");
         }
-        boolean exists = questions.stream()
-                .anyMatch(q -> q.getQuestion().equalsIgnoreCase(newQuestion.getQuestion()) &&
-                        q.getAnswer().equals(newQuestion.getAnswer()));
-        if (exists) {
+        if (questionText.equalsIgnoreCase(answerText)) { // Проверка на равенство (без учёта регистра)
+            throw new IllegalArgumentException("Вопрос и ответ не должны совпадать.");
+        }
+        Question newQuestion = new Question(questionText, answerText);
+        if (questions.contains(newQuestion)) {
             throw new DuplicateQuestionException("Такой вопрос уже существует.");
         }
         questions.add(newQuestion);
@@ -33,10 +33,10 @@ public class JavaQuestionService implements QuestionService {
         if (question == null || question.getQuestion() == null || question.getAnswer() == null) {
             throw new NullQuestionException("Вопрос не может быть null.");
         }
-        boolean exists = questions.stream()
-                .anyMatch(q -> q.getQuestion().equalsIgnoreCase(question.getQuestion()) &&
-                        q.getAnswer().equals(question.getAnswer()));
-        if (exists) {
+        if (question.getQuestion().equalsIgnoreCase(question.getAnswer())) {
+            throw new IllegalArgumentException("Вопрос и ответ не должны совпадать.");
+        }
+        if (questions.contains(question)) {
             throw new DuplicateQuestionException("Такой вопрос уже существует.");
         }
         questions.add(question);
